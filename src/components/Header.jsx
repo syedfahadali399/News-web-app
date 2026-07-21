@@ -90,6 +90,8 @@ const Header = ({ setIsSidebarOpen }) => {
 
                 {isSearchFocused && (searchQuery.length > 0 || properNewsResults.length > 0) && (
                   <div className="absolute top-full left-0 right-0 z-70 mt-3 bg-[#1E293B] border border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-top-4 fade-in duration-200 backdrop-blur-2xl">
+     
+     
                     <div className="max-h-125 overflow-y-auto no-scrollbar">
                       {properNewsResults.length > 0 ? (
                         <div className="p-2">
