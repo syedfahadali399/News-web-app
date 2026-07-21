@@ -1,11 +1,11 @@
-import { Search, Zap, History } from "lucide-react"
+import { Search, Zap, History, Menu } from "lucide-react"
 import { useEffect, useRef, useState, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchDataByQuery } from "../store/Features/newsSlice"
 import { useDebounce } from "../hooks/Debounce"
 import { Link } from "react-router"
 
-const Header = () => {
+const Header = ({ setIsSidebarOpen }) => {
 
     const date = new Date()
     const dispatch = useDispatch()
@@ -43,7 +43,6 @@ const Header = () => {
         setIsSearchFocused(false)
       }, 1500)
     }
-
     
     useEffect(() => {
         if (debounceQuery.trim() !== "") {
@@ -61,9 +60,17 @@ const Header = () => {
               <p className="text-slate-400 text-sm font-medium">{date.toLocaleDateString()} • Real-time Updates</p>
             </div>
 
-            <div className="flex items-center gap-4 relative z-50" 
+            <div className="flex items-center gap-3 relative z-50 flex-1 lg:flex-none" 
             ref={searchRef}
             >
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-[#1E293B]/80 text-slate-200 shadow-lg transition-all hover:border-indigo-400/20 hover:text-indigo-400"
+                aria-label="Open sidebar"
+              >
+                <Menu size={20} />
+              </button>
+
               <div className="relative flex-1 lg:w-112.5">
                 <Search className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors 
                   ${isSearchFocused ? 'text-indigo-400' : 'text-slate-500'}
