@@ -26,7 +26,7 @@ const TopHeadline = () => {
     
   return (
     <>
-      <div className="bg-indigo-600 h-10 flex items-center overflow-hidden border-b border-white/10">
+      <div className="bg-indigo-600 h-12 flex items-center overflow-hidden border-b border-white/10 md:ml-20 lg:ml-64">
         <div className="flex items-center px-4 bg-indigo-700 h-full font-black text-[10px] uppercase tracking-tighter text-white z-10">
           <Zap size={14} className="mr-2" /> Breaking
         </div>

@@ -1,8 +1,9 @@
-import { Search, Zap, History, Menu } from "lucide-react"
-import { useEffect, useRef, useState, useMemo } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import { fetchDataByQuery } from "../store/Features/newsSlice"
+import { useEffect, useRef, useState, useMemo } from "react"
+import { Search, Zap, History, Menu } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
 import { useDebounce } from "../hooks/Debounce"
+import { createPortal } from "react-dom"
 import { Link } from "react-router"
 
 const Header = ({ setIsSidebarOpen }) => {
@@ -15,6 +16,8 @@ const Header = ({ setIsSidebarOpen }) => {
     const [searchQuery, setSearchQuery] = useState("")
     const [isSearchFocused, setIsSearchFocused] = useState(false)
     const searchRef = useRef()
+    const inputRef = useRef()
+    const [dropdownPos, setDropdownPos] = useState(null)
 
     const debounceQuery = useDebounce(searchQuery, 1000)
 
@@ -47,9 +50,25 @@ const Header = ({ setIsSidebarOpen }) => {
     useEffect(() => {
         if (debounceQuery.trim() !== "") {
             dispatch(fetchDataByQuery({ apiKey, query: debounceQuery }))
-
         }
     }, [debounceQuery])
+
+    useEffect(() => {
+      if (!isSearchFocused) return
+      const update = () => {
+        const el = inputRef.current
+        if (!el) return setDropdownPos(null)
+        const rect = el.getBoundingClientRect()
+        setDropdownPos({ left: rect.left + window.scrollX, top: rect.bottom + window.scrollY, width: rect.width })
+      }
+      update()
+      window.addEventListener('resize', update)
+      window.addEventListener('scroll', update, true)
+      return () => {
+        window.removeEventListener('resize', update)
+        window.removeEventListener('scroll', update, true)
+      }
+    }, [isSearchFocused])
   return (
     <>
        <div className="relative z-0 flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
@@ -78,6 +97,7 @@ const Header = ({ setIsSidebarOpen }) => {
                 <input 
                   type="text"
                   placeholder="Search news engine..."
+                  ref={inputRef}
                   className={`w-full bg-[#1E293B] border rounded-2xl py-3.5 pl-12 pr-4 focus:outline-none transition-all text-sm font-medium ${
                     isSearchFocused 
                     ? 'border-indigo-500 ring-4 ring-indigo-500/10 shadow-2xl' 
@@ -87,64 +107,59 @@ const Header = ({ setIsSidebarOpen }) => {
                   onFocus={() => setIsSearchFocused(true)}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-
-                {isSearchFocused && (searchQuery.length > 0 || properNewsResults.length > 0) && (
-                  <div className="absolute top-full left-0 right-0 z-70 mt-3 bg-[#1E293B] border border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-top-4 fade-in duration-200 backdrop-blur-2xl">
-     
-     
-                    <div className="max-h-125 overflow-y-auto no-scrollbar">
-                      {properNewsResults.length > 0 ? (
-                        <div className="p-2">
-                          <div className="px-4 py-3 flex items-center justify-between">
-                             <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 flex items-center gap-2">
-                               <Zap size={12} /> Top Matches
-                             </span>
-                             <span className="text-[10px] text-slate-500 font-bold">{properNewsResults.length} items found</span>
-                          </div>
-                          <div className={`space-y-1`}>
-                            {properNewsResults.map((art) => {
-                                
-                                return (
-
-                              <Link
-                                onClick={handleSearch}
-                                to={`/news-detail/${art.article_id}`}
-                                key={art.article_id}
-                                className="w-full text-left p-3 flex items-start gap-4 hover:bg-white/5 rounded-2xl transition-all group"
-                              >
-                                <img src={art.image_url} className="w-16 h-16 rounded-xl object-cover shrink-0" alt="image" />
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                      {art.category.map(cat => {
-                                        return (
-                                            <span key={cat} className="text-[9px] font-black text-indigo-400 uppercase tracking-tighter px-1.5 py-0.5 bg-indigo-500/10 rounded">{cat}</span>
-                                        )
-                                      })}
-                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic">{art.source_name}</span>
+                {isSearchFocused && (searchQuery.length > 0 || properNewsResults.length > 0) && dropdownPos && createPortal(
+                  <div style={{position: 'absolute', left: dropdownPos.left + 'px', top: dropdownPos.top + 'px', width: dropdownPos.width + 'px'}} className="z-[9999] mt-3">
+                    <div className="bg-[#1E293B] border border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-top-4 fade-in duration-200 backdrop-blur-2xl">
+                      <div className="max-h-125 overflow-y-auto no-scrollbar">
+                        {properNewsResults.length > 0 ? (
+                          <div className="p-2">
+                            <div className="px-4 py-3 flex items-center justify-between">
+                               <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 flex items-center gap-2">
+                                 <Zap size={12} /> Top Matches
+                               </span>
+                               <span className="text-[10px] text-slate-500 font-bold">{properNewsResults.length} items found</span>
+                            </div>
+                            <div className={`space-y-1`}>
+                              {properNewsResults.map((art) => {
+                                  return (
+                                <Link
+                                  onClick={handleSearch}
+                                  to={`/news-detail/${art.article_id}`}
+                                  key={art.article_id}
+                                  className="w-full text-left p-3 flex items-start gap-4 hover:bg-white/5 rounded-2xl transition-all group"
+                                >
+                                  <img src={art.image_url} className="w-16 h-16 rounded-xl object-cover shrink-0" alt="image" />
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        {art.category.map(cat => {
+                                          return (
+                                              <span key={cat} className="text-[9px] font-black text-indigo-400 uppercase tracking-tighter px-1.5 py-0.5 bg-indigo-500/10 rounded">{cat}</span>
+                                          )
+                                        })}
+                                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic">{art.source_name}</span>
+                                    </div>
+                                    <h4 className="text-sm font-bold text-slate-200 line-clamp-2 group-hover:text-indigo-400 transition-colors leading-tight">
+                                      {art.title}
+                                    </h4>
                                   </div>
-                                  <h4 className="text-sm font-bold text-slate-200 line-clamp-2 group-hover:text-indigo-400 transition-colors leading-tight">
-                                    {art.title}
-                                  </h4>
-                                </div>
-                              </Link>
-                                )
-                            }
-                            )}
+                                </Link>
+                                  )
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="p-12 text-center space-y-3">
-                           <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto text-slate-500">
-                             <History size={24} />
-                           </div>
-                           <p className="text-sm font-bold text-slate-400">No matching headlines</p>
-                           <p className="text-xs text-slate-500 font-medium px-4">Try searching for "tech", "finance", or broader keywords.</p>
-                        </div>
-                      )}
-
+                        ) : (
+                          <div className="p-12 text-center space-y-3">
+                             <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto text-slate-500">
+                               <History size={24} />
+                             </div>
+                             <p className="text-sm font-bold text-slate-400">No matching headlines</p>
+                             <p className="text-xs text-slate-500 font-medium px-4">Try searching for "tech", "finance", or broader keywords.</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  </div>, document.body)
+                }
               </div>
             </div>
           </div>
