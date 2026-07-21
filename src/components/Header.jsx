@@ -52,7 +52,7 @@ const Header = ({ setIsSidebarOpen }) => {
     }, [debounceQuery])
   return (
     <>
-       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 relative">
+       <div className="relative z-0 flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
             <div>
               <h1 className="text-3xl font-black tracking-tight text-white mb-1">
                 {currentTabHeading}
@@ -60,7 +60,7 @@ const Header = ({ setIsSidebarOpen }) => {
               <p className="text-slate-400 text-sm font-medium">{date.toLocaleDateString()} • Real-time Updates</p>
             </div>
 
-            <div className="flex items-center gap-3 relative z-50 flex-1 lg:flex-none" 
+            <div className="relative z-10 flex items-center gap-3 flex-1 lg:flex-none" 
             ref={searchRef}
             >
               <button
@@ -89,7 +89,7 @@ const Header = ({ setIsSidebarOpen }) => {
                 />
 
                 {isSearchFocused && (searchQuery.length > 0 || properNewsResults.length > 0) && (
-                  <div className="absolute top-full left-0 right-0 mt-3 bg-[#1E293B] border border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-top-4 fade-in duration-200 backdrop-blur-2xl">
+                  <div className="absolute top-full left-0 right-0 z-20 mt-3 bg-[#1E293B] border border-white/10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in slide-in-from-top-4 fade-in duration-200 backdrop-blur-2xl">
                     <div className="max-h-125 overflow-y-auto no-scrollbar">
                       {properNewsResults.length > 0 ? (
                         <div className="p-2">

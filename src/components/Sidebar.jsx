@@ -7,11 +7,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   return (
     <>
       <div
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
         onClick={closeSidebar}
       />
 
-      <aside className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/5 bg-[#1E293B]/90 py-8 px-4 backdrop-blur-xl transition-transform duration-300 md:w-20 lg:w-64 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-[60] flex w-72 flex-col border-r border-white/5 bg-[#1E293B]/90 py-8 px-4 backdrop-blur-xl transition-transform duration-300 md:w-20 lg:w-64 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
           <div className="mb-8 flex items-center justify-between px-2">
             <Link to={"/"} className="flex cursor-pointer items-center gap-3" onClick={closeSidebar}>
               <div className="bg-indigo-500 p-2 rounded-lg text-white">
